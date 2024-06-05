@@ -29,16 +29,32 @@ export const styles = StyleSheet.create({
         marginVertical: 50,
         marginHorizontal: 25
     },
-    headerHome: {
+    header: {
         flexDirection: "row",
         gap: 15,
         alignItems: 'center'
     },
-    iconProfile: {
+    iconEnd: {
         alignItems: 'flex-end',
         flex: 1
     },
-    modalProfile:{
-        paddingHorizontal:20
+    modal: {
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        marginHorizontal: 20,
+        borderRadius: 10,
+        backgroundColor: "#fff",
+        gap: 10
+    },
+    rootMessage: {
+        flexDirection: 'row',
+        paddingHorizontal: 10,
+        paddingVertical: 20,
+        alignItems:'center',
+    },
+    fabMessage:{
+        position:'absolute',
+        bottom: 20,
+        right: 15
     }
 })
