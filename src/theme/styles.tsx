@@ -56,5 +56,16 @@ export const styles = StyleSheet.create({
         position:'absolute',
         bottom: 20,
         right: 15
+    },
+    rootDetail:{
+        flex:1,
+        paddingHorizontal:20,
+        paddingVertical:10,
+        backgroundColor: '#fff',
+        gap:20
+    }, 
+    textDetail:{
+        fontWeight:'bold',
+        fontSize:18
     }
 })

@@ -8,6 +8,7 @@ import { auth } from '../configs/firebaseConfig';
 import { View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { styles } from '../theme/styles';
+import { DetailMessageScreen } from '../screens/HomeScreen/DetailMessageScreen';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +16,7 @@ const Stack = createStackNavigator();
 interface Routes {
     name: string;
     screen: () => JSX.Element; //elemento jsx
+    headerShow?: boolean;
 }
 
 //Arreglo que contenga las rutas si el usuario no está autenticado
@@ -25,7 +27,8 @@ const routesNoAuth: Routes[] = [
 
 //Arreglo que contenga las rutas si el usuario está autenticado
 const routesAuth: Routes[] = [
-    { name: "Home", screen: HomeScreen }
+    { name: "Home", screen: HomeScreen },
+    { name: "Detail", screen: DetailMessageScreen, headerShow: true }
 ]
 
 export const StackNavigator = () => {
@@ -59,11 +62,19 @@ export const StackNavigator = () => {
                     {
                         !isAuth ?
                             routesNoAuth.map((item, index) => (
-                                <Stack.Screen key={index} name={item.name} options={{ headerShown: false }} component={item.screen} />
+                                <Stack.Screen
+                                    key={index}
+                                    name={item.name}
+                                    options={{ headerShown: false }}
+                                    component={item.screen} />
                             ))
                             :
                             routesAuth.map((item, index) => (
-                                <Stack.Screen key={index} name={item.name} options={{ headerShown: false }} component={item.screen} />
+                                <Stack.Screen
+                                    key={index}
+                                    name={item.name}
+                                    options={{ headerShown: item.headerShow ?? false}}
+                                    component={item.screen} />
                             ))
                     }
                 </Stack.Navigator>

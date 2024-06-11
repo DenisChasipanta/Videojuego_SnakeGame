@@ -56,7 +56,6 @@ export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: P
             console.log(ex);
         }
         setShowModalMessage(false);
-
     }
 
     return (

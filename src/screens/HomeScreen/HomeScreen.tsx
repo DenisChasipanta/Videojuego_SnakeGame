@@ -3,10 +3,11 @@ import { View } from 'react-native'
 import { Avatar, Button, Divider, FAB, IconButton, Modal, Portal, Text, TextInput } from 'react-native-paper'
 import { styles } from '../../theme/styles'
 import firebase, { updateProfile } from 'firebase/auth';
-import { auth } from '../../configs/firebaseConfig';
+import { auth, dbRealTime } from '../../configs/firebaseConfig';
 import { FlatList } from 'react-native-gesture-handler';
 import { MessageCardComponent } from './components/MessageCardComponent';
 import { NewMessageComponent } from './components/NewMessageComponent';
+import { onValue, ref } from 'firebase/database';
 
 
 //Interface - data usuario
@@ -15,7 +16,7 @@ interface FormUser {
 }
 
 //Interface - message
-interface Message {
+export interface Message {
     id: string;
     to: string;
     subject: string;
@@ -37,6 +38,7 @@ export const HomeScreen = () => {
         setUserAuth(auth.currentUser);
         //console.log(userAuth);
         setFormUser({ name: auth.currentUser?.displayName ?? "" })
+        getAllMessages();
     }, [])
 
     //hook useState: manipular el modal perfil
@@ -46,9 +48,7 @@ export const HomeScreen = () => {
     const [showModalMessage, setShowModalMessage] = useState<boolean>(false);
 
     //hook useState: lista de mensajes
-    const [messages, setMessages] = useState<Message[]>([
-        { id: '1', to: 'Ariel Ron', subject: 'Estudiar', message: 'Debes estudiar para el jueves' }
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
 
     //función que cambie los valores del formUser
     const handlerSetValues = (key: string, value: string) => {
@@ -63,13 +63,34 @@ export const HomeScreen = () => {
         setShowModal(false);
     }
 
+    //Función para consultar la data desde firebase
+    const getAllMessages = () => {
+        //1. Referencia a la BDD - tabla
+        const dbRef = ref(dbRealTime, 'messages');
+        //2. Consultar data
+        onValue(dbRef, (snapshot) => {
+            //3. Capturar data
+            const data = snapshot.val(); //Obtener los valores en un formato esperado
+            //4. Obtener keys data
+            const getKeys = Object.keys(data);
+            //5. Crear un arreglo lista de mensajes
+            const listMessages: Message[] = [];
+            getKeys.forEach((key) => {
+                const value = { ...data[key], id: key };
+                listMessages.push(value);
+            })
+            //Agregando la data al arreglo messages hook
+            setMessages(listMessages);
+        })
+    }
+
     return (
         <>
             <View style={styles.rootHome}>
                 <View style={styles.header}>
                     <Avatar.Text size={50} label="MI" />
                     <View>
-                        <Text variant='bodySmall'>Bienvenido</Text>
+                        <Text variant='bodySmall'>Bienvenida</Text>
                         <Text variant='labelLarge'>{userAuth?.displayName}</Text>
                     </View>
                     <View style={styles.iconEnd}>
@@ -84,7 +105,7 @@ export const HomeScreen = () => {
                 <View>
                     <FlatList
                         data={messages}
-                        renderItem={({ item }) => <MessageCardComponent />}
+                        renderItem={({ item }) => <MessageCardComponent message={item} />}
                         keyExtractor={item => item.id}
                     />
                 </View>
@@ -114,6 +135,12 @@ export const HomeScreen = () => {
                         value={userAuth?.email!}
                         disabled />
                     <Button mode='contained' onPress={handlerUpdateUser}>Actualizar</Button>
+                    <IconButton
+                        icon="logout"
+                        size={30}
+                        mode='contained'
+                        onPress={() => console.log('Pressed')}
+                    />
                 </Modal>
             </Portal>
             <FAB
@@ -121,7 +148,7 @@ export const HomeScreen = () => {
                 style={styles.fabMessage}
                 onPress={() => setShowModalMessage(true)}
             />
-            <NewMessageComponent showModalMessage={showModalMessage} setShowModalMessage={setShowModalMessage}/>
+            <NewMessageComponent showModalMessage={showModalMessage} setShowModalMessage={setShowModalMessage} />
         </>
     )
 }
