@@ -3,7 +3,7 @@ import { Modal, Portal, Text, IconButton, Divider, TextInput, Button } from 'rea
 import { styles } from '../../../theme/styles';
 import { View } from 'react-native';
 import { push, ref, set } from 'firebase/database';
-import { dbRealTime } from '../../../configs/firebaseConfig';
+import { auth, dbRealTime } from '../../../configs/firebaseConfig';
 
 //Interface - Props del componente: propiedades
 interface Props {
@@ -40,7 +40,7 @@ export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: P
         //console.log(formMessage);
         // Guardar los datos en BDD
         //1. Referencia a la BDD y creación tabla
-        const dbRef = ref(dbRealTime, 'messages');
+        const dbRef = ref(dbRealTime, 'messages/' + auth.currentUser?.uid);
         //2. Crear una colección - evitando sobreescritura de la data
         const saveMessage = push(dbRef);
         //3. Almacenar en la BDD

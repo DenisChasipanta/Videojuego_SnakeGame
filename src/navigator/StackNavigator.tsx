@@ -20,13 +20,9 @@ interface Routes {
 }
 
 //Arreglo que contenga las rutas si el usuario no está autenticado
-const routesNoAuth: Routes[] = [
+const routes: Routes[] = [
     { name: "Login", screen: LoginScreen },
-    { name: "Register", screen: RegisterScreen }
-]
-
-//Arreglo que contenga las rutas si el usuario está autenticado
-const routesAuth: Routes[] = [
+    { name: "Register", screen: RegisterScreen },
     { name: "Home", screen: HomeScreen },
     { name: "Detail", screen: DetailMessageScreen, headerShow: true }
 ]
@@ -58,24 +54,15 @@ export const StackNavigator = () => {
                     <ActivityIndicator size={35} />
                 </View>
             ) : (
-                <Stack.Navigator>
+                <Stack.Navigator initialRouteName={isAuth ? 'Home' : 'Login'}>
                     {
-                        !isAuth ?
-                            routesNoAuth.map((item, index) => (
-                                <Stack.Screen
-                                    key={index}
-                                    name={item.name}
-                                    options={{ headerShown: false }}
-                                    component={item.screen} />
-                            ))
-                            :
-                            routesAuth.map((item, index) => (
-                                <Stack.Screen
-                                    key={index}
-                                    name={item.name}
-                                    options={{ headerShown: item.headerShow ?? false}}
-                                    component={item.screen} />
-                            ))
+                        routes.map((item, index) => (
+                            <Stack.Screen
+                                key={index}
+                                name={item.name}
+                                options={{ headerShown: item.headerShow ?? false }}
+                                component={item.screen} />
+                        ))
                     }
                 </Stack.Navigator>
             )}

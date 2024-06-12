@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { Avatar, Button, Divider, FAB, IconButton, Modal, Portal, Text, TextInput } from 'react-native-paper'
 import { styles } from '../../theme/styles'
-import firebase, { updateProfile } from 'firebase/auth';
+import firebase, { signOut, updateProfile } from 'firebase/auth';
 import { auth, dbRealTime } from '../../configs/firebaseConfig';
 import { FlatList } from 'react-native-gesture-handler';
 import { MessageCardComponent } from './components/MessageCardComponent';
 import { NewMessageComponent } from './components/NewMessageComponent';
 import { onValue, ref } from 'firebase/database';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 
 
 //Interface - data usuario
@@ -50,6 +51,9 @@ export const HomeScreen = () => {
     //hook useState: lista de mensajes
     const [messages, setMessages] = useState<Message[]>([]);
 
+    //hook navegación
+    const navigation = useNavigation();
+
     //función que cambie los valores del formUser
     const handlerSetValues = (key: string, value: string) => {
         setFormUser({ ...formUser, [key]: value })
@@ -66,11 +70,13 @@ export const HomeScreen = () => {
     //Función para consultar la data desde firebase
     const getAllMessages = () => {
         //1. Referencia a la BDD - tabla
-        const dbRef = ref(dbRealTime, 'messages');
+        const dbRef = ref(dbRealTime, 'messages/' + auth.currentUser?.uid);
         //2. Consultar data
         onValue(dbRef, (snapshot) => {
             //3. Capturar data
             const data = snapshot.val(); //Obtener los valores en un formato esperado
+            //VERIFICACIÓN DE DATA
+            if (!data) return; //Veriifcando que esté vacía
             //4. Obtener keys data
             const getKeys = Object.keys(data);
             //5. Crear un arreglo lista de mensajes
@@ -82,6 +88,13 @@ export const HomeScreen = () => {
             //Agregando la data al arreglo messages hook
             setMessages(listMessages);
         })
+    }
+
+    //Función cerrar sesión
+    const handlerSignOut = async () => {
+        await signOut(auth);
+        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Login' }] }));
+        setShowModal(false);
     }
 
     return (
@@ -135,12 +148,14 @@ export const HomeScreen = () => {
                         value={userAuth?.email!}
                         disabled />
                     <Button mode='contained' onPress={handlerUpdateUser}>Actualizar</Button>
-                    <IconButton
-                        icon="logout"
-                        size={30}
-                        mode='contained'
-                        onPress={() => console.log('Pressed')}
-                    />
+                    <View style={styles.iconSignOut}>
+                        <IconButton
+                            icon="logout"
+                            size={35}
+                            mode='contained'
+                            onPress={handlerSignOut}
+                        />
+                    </View>
                 </Modal>
             </Portal>
             <FAB
