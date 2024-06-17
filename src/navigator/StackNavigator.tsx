@@ -8,7 +8,8 @@ import { auth } from '../configs/firebaseConfig';
 import { View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { styles } from '../theme/styles';
-import { DetailMessageScreen } from '../screens/HomeScreen/DetailMessageScreen';
+import Game from '../screens/HomeScreen/components/Game';
+
 
 const Stack = createStackNavigator();
 
@@ -24,7 +25,7 @@ const routes: Routes[] = [
     { name: "Login", screen: LoginScreen },
     { name: "Register", screen: RegisterScreen },
     { name: "Home", screen: HomeScreen },
-    { name: "Detail", screen: DetailMessageScreen, headerShow: true }
+    { name: "Game", screen: Game}
 ]
 
 export const StackNavigator = () => {
